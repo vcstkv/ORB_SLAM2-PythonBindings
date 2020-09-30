@@ -11,11 +11,11 @@ class ORBSlamPython
 {
 public:
     ORBSlamPython(std::string vocabFile, std::string settingsFile,
-        ORB_SLAM2::System::eSensor sensorMode = ORB_SLAM2::System::eSensor::RGBD);
-    ORBSlamPython(const char* vocabFile, const char* settingsFile,
-        ORB_SLAM2::System::eSensor sensorMode = ORB_SLAM2::System::eSensor::RGBD);
+                  ORB_SLAM2::System::eSensor sensorMode = ORB_SLAM2::System::eSensor::RGBD);
+    ORBSlamPython(const char *vocabFile, const char *settingsFile,
+                  ORB_SLAM2::System::eSensor sensorMode = ORB_SLAM2::System::eSensor::RGBD);
     ~ORBSlamPython();
-    
+
     bool initialize();
     bool isRunning();
     bool loadAndProcessMono(std::string imageFile, double timestamp);
@@ -26,9 +26,16 @@ public:
     bool processRGBD(cv::Mat image, cv::Mat depthImage, double timestamp);
     void reset();
     void shutdown();
+    void activateSLAMTraking();
+    void deactivateSLAMTraking();
+    boost::python::list getCurrentPoints() const;
     ORB_SLAM2::Tracking::eTrackingState getTrackingState() const;
+    bool isKeyFrame();
+    boost::python::tuple getCameraMatrix() const;
+    boost::python::tuple getFramePose() const;
     unsigned int getNumFeatures() const;
     unsigned int getNumMatches() const;
+    boost::python::tuple getDistCoeff() const;
     boost::python::list getKeyframePoints() const;
     boost::python::list getTrajectoryPoints() const;
     boost::python::list getTrackedMappoints() const;
@@ -37,10 +44,10 @@ public:
     void setMode(ORB_SLAM2::System::eSensor mode);
     void setRGBMode(bool rgb);
     void setUseViewer(bool useViewer);
-    
+
     static bool saveSettingsFile(boost::python::dict settings, std::string settingsFilename);
     static boost::python::dict loadSettingsFile(std::string settingsFilename);
-    
+
 private:
     std::string vocabluaryFile;
     std::string settingsFile;
@@ -49,7 +56,5 @@ private:
     bool bUseViewer;
     bool bUseRGB;
 };
-
-
 
 #endif // ORBSLAMPYTHON_H
