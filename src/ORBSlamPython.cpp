@@ -58,11 +58,10 @@ BOOST_PYTHON_MODULE(orbslam2)
         .def("reset", &ORBSlamPython::reset)
         .def("activateSLAM", &ORBSlamPython::activateSLAMTraking)
         .def("deactivateSLAM", &ORBSlamPython::deactivateSLAMTraking)
-        .def("get_current_points",&ORBSlamPython::getCurrentPoints)
-        .def("get_frame_pose",&ORBSlamPython::getFramePose)
-        .def("get_camera_matrix",&ORBSlamPython::getCameraMatrix)
-        .def("get_dist_coef",&ORBSlamPython::getDistCoeff)
-        .def("is_keyFrame",&ORBSlamPython::isKeyFrame)
+        .def("get_current_points", &ORBSlamPython::getCurrentPoints)
+        .def("get_frame_pose", &ORBSlamPython::getFramePose)
+        .def("get_camera_matrix", &ORBSlamPython::getCameraMatrix)
+        .def("get_dist_coef", &ORBSlamPython::getDistCoeff)
         .def("set_mode", &ORBSlamPython::setMode)
         .def("set_use_viewer", &ORBSlamPython::setUseViewer)
         .def("get_keyframe_points", &ORBSlamPython::getKeyframePoints)
@@ -367,11 +366,11 @@ boost::python::list ORBSlamPython::getCurrentPoints() const
 {
     if (system)
     {
-       
+
         ORB_SLAM2::Tracking *pTracker = system->GetTracker();
         boost::python::list map_points;
         unsigned int num = pTracker->mCurrentFrame.mvKeys.size();
-        vector<cv::KeyPoint> Kps =  pTracker->mCurrentFrame.mvKeys ;
+        vector<cv::KeyPoint> Kps = pTracker->mCurrentFrame.mvKeys;
         if (pTracker->mCurrentFrame.mvpMapPoints.size() < num)
         {
             num = pTracker->mCurrentFrame.mvpMapPoints.size();
@@ -405,24 +404,24 @@ boost::python::tuple ORBSlamPython::getFramePose() const
 {
     if (system)
     {
-        
+
         ORB_SLAM2::Tracking *pTracker = system->GetTracker();
-        cv::Mat pose= pTracker->mCurrentFrame.mTcw;
-        if( pose.rows * pose.cols >0)
+        cv::Mat pose = pTracker->mCurrentFrame.mTcw;
+        if (pose.rows * pose.cols > 0)
         {
             return boost::python::make_tuple(
-                    pose.at<float>(0, 0),
-                    pose.at<float>(0, 1),
-                    pose.at<float>(0, 2),
-                    pose.at<float>(0, 3),
-                    pose.at<float>(1, 0),
-                    pose.at<float>(1, 1),
-                    pose.at<float>(1, 2),
-                    pose.at<float>(1, 3),
-                    pose.at<float>(2, 0),
-                    pose.at<float>(2, 1),
-                    pose.at<float>(2, 2),
-                    pose.at<float>(2, 3));
+                pose.at<float>(0, 0),
+                pose.at<float>(0, 1),
+                pose.at<float>(0, 2),
+                pose.at<float>(0, 3),
+                pose.at<float>(1, 0),
+                pose.at<float>(1, 1),
+                pose.at<float>(1, 2),
+                pose.at<float>(1, 3),
+                pose.at<float>(2, 0),
+                pose.at<float>(2, 1),
+                pose.at<float>(2, 2),
+                pose.at<float>(2, 3));
         }
     }
     return boost::python::make_tuple();
@@ -432,51 +431,35 @@ boost::python::tuple ORBSlamPython::getCameraMatrix() const
 {
     if (system)
     {
-       
+
         ORB_SLAM2::Tracking *pTracker = system->GetTracker();
-        cv::Mat cm =pTracker->mCurrentFrame.mK;
+        cv::Mat cm = pTracker->mCurrentFrame.mK;
         return boost::python::make_tuple(
-                cm.at<float>(0, 0),
-                cm.at<float>(0, 1),
-                cm.at<float>(0, 2),
-                cm.at<float>(1, 0),
-                cm.at<float>(1, 1),
-                cm.at<float>(1, 2),
-                cm.at<float>(2, 0),
-                cm.at<float>(2, 1),
-                cm.at<float>(2, 2));
-        
-            
+            cm.at<float>(0, 0),
+            cm.at<float>(0, 1),
+            cm.at<float>(0, 2),
+            cm.at<float>(1, 0),
+            cm.at<float>(1, 1),
+            cm.at<float>(1, 2),
+            cm.at<float>(2, 0),
+            cm.at<float>(2, 1),
+            cm.at<float>(2, 2));
     }
     return boost::python::make_tuple();
-}
-
-bool ORBSlamPython::isKeyFrame() {
-    if(system)
-    {
-        ORB_SLAM2::Tracking *pTracker = system->GetTracker();
-        if(pTracker->mCurrentFrame.mpReferenceKF)
-        {
-            return true;
-        }
-    }
-    return false;
-
 }
 
 boost::python::tuple ORBSlamPython::getDistCoeff() const
 {
     if (system)
     {
-    
+
         ORB_SLAM2::Tracking *pTracker = system->GetTracker();
-        cv::Mat dist= pTracker->mCurrentFrame.mDistCoef;
+        cv::Mat dist = pTracker->mCurrentFrame.mDistCoef;
         return boost::python::make_tuple(
-                dist.at<float>(0),
-                dist.at<float>(1),
-                dist.at<float>(2),
-                dist.at<float>(3)
-        ); 
+            dist.at<float>(0),
+            dist.at<float>(1),
+            dist.at<float>(2),
+            dist.at<float>(3));
     }
     return boost::python::make_tuple();
 }
