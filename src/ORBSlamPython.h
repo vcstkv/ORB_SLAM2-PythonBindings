@@ -30,8 +30,8 @@ public:
     void deactivateSLAMTraking();
     boost::python::list getCurrentPoints() const;
     ORB_SLAM2::Tracking::eTrackingState getTrackingState() const;
-    boost::python::tuple getCameraMatrix() const;
-    boost::python::tuple getFramePose() const;
+    PyObject* getCameraMatrix() const;
+    PyObject* getFramePose() const;
     unsigned int getNumFeatures() const;
     unsigned int getNumMatches() const;
     boost::python::tuple getDistCoeff() const;
