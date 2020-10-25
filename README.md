@@ -1,4 +1,4 @@
-# ORB_SLAM2-PythonBindings
+# ORB_SLAM3-PythonBindings
 
 A python wrapper for ORB_SLAM3, which can be found at [https://github.com/UZ-SLAMLab/ORB_SLAM3](https://github.com/UZ-SLAMLab/ORB_SLAM3).
 This is designed to work with the base version of ORB_SLAM3, with a couple of minimal API changes to access the system output.
