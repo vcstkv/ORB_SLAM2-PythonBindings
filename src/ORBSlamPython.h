@@ -22,6 +22,10 @@ public:
     bool processMono(cv::Mat image, double timestamp, std::string imageFile);
     bool loadAndProcessStereo(std::string leftImageFile, std::string rightImageFile, double timestamp);
     bool processStereo(cv::Mat leftImage, cv::Mat rightImage, double timestamp);
+    bool loadAndProcessImuMono(std::string imageFile, double timestamp, boost::python::numpy::ndarray imu);
+    bool processImuMono(cv::Mat image, double timestamp, std::string imageFile, , boost::python::numpy::ndarray imu);
+    bool loadAndProcessImuStereo(std::string leftImageFile, std::string rightImageFile, double timestamp, boost::python::numpy::ndarray imu);
+    bool processImuStereo(cv::Mat leftImage, cv::Mat rightImage, double timestamp, boost::python::numpy::ndarray imu);
     bool loadAndProcessRGBD(std::string imageFile, std::string depthImageFile, double timestamp);
     bool processRGBD(cv::Mat image, cv::Mat depthImage, double timestamp);
     void reset();
