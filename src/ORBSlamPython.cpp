@@ -42,7 +42,9 @@ BOOST_PYTHON_MODULE(orbslam3)
     boost::python::enum_<ORB_SLAM3::System::eSensor>("Sensor")
         .value("MONOCULAR", ORB_SLAM3::System::eSensor::MONOCULAR)
         .value("STEREO", ORB_SLAM3::System::eSensor::STEREO)
-        .value("RGBD", ORB_SLAM3::System::eSensor::RGBD);
+        .value("RGBD", ORB_SLAM3::System::eSensor::RGBD)
+        .value("IMU_MONOCULAR", ORB_SLAM3::System::eSensor::IMU_MONOCULAR)
+        .value("IMU_STEREO", ORB_SLAM3::System::eSensor::IMU_STEREO);
 
     boost::python::class_<ORBSlamPython, boost::noncopyable>("System", boost::python::init<const char *, const char *, boost::python::optional<ORB_SLAM3::System::eSensor>>())
         .def(boost::python::init<std::string, std::string, boost::python::optional<ORB_SLAM3::System::eSensor>>())
@@ -169,7 +171,7 @@ bool ORBSlamPython::loadAndProcessImuMono(std::string imageFile, double timestam
     {
         cv::cvtColor(im, im, cv::COLOR_BGR2RGB);
     }
-    return this->processMono(im, timestamp, imageFile, imu);
+    return this->processImuMono(im, timestamp, imageFile, imu);
 }
 
 bool ORBSlamPython::processImuMono(cv::Mat image, double timestamp, std::string imageFile, boost::python::numpy::ndarray imu)
@@ -180,8 +182,8 @@ bool ORBSlamPython::processImuMono(cv::Mat image, double timestamp, std::string 
     }
     if (image.data)
     {
-
-        cv::Mat pose = system->TrackMonocular(image, timestamp, vector<ORB_SLAM3::IMU::Point>(), imageFile);
+        vector<ORB_SLAM3::IMU::Point> vImuMeas = convertImuFromNDArray(imu);
+        cv::Mat pose = system->TrackMonocular(image, timestamp, vImuMeas);
         return !pose.empty();
     }
     else
@@ -247,8 +249,8 @@ bool ORBSlamPython::processImuStereo(cv::Mat leftImage, cv::Mat rightImage, doub
     }
     if (leftImage.data && rightImage.data)
     {
-        // convert imu to vector
-        cv::Mat pose = system->TrackStereo(leftImage, rightImage, timestamp);
+        vector<ORB_SLAM3::IMU::Point> vImuMeas = convertImuFromNDArray(imu);
+        cv::Mat pose = system->TrackStereo(leftImage, rightImage, timestamp, vImuMeas);
         return !pose.empty();
     }
     else
@@ -745,15 +747,19 @@ boost::python::list readSequence(cv::FileNode fn, int depth)
 vector<ORB_SLAM3::IMU::Point> convertImuFromNDArray(boost::python::numpy::ndarray imu)
 {
     vector<ORB_SLAM3::IMU::Point> vImuMeas;
-    for (i = 0; i < imu.shape(0); i++)
+    double vAccX, vAccY, vAccZ, vGyroX, vGyroY, vGyroZ;
+    float vTimestamp;
+    Py_intptr_t const *strides = imu.get_strides();
+    for (int i = 0; i < imu.shape(0); i++)
     {
-        vAccX = *reinterpret_cast<float const *>(input.get_data() + i * strides[0] + 0 * strides[1]);
-        vAccY = *reinterpret_cast<float const *>(input.get_data() + i * strides[0] + 1 * strides[1]);
-        vAccZ = *reinterpret_cast<float const *>(input.get_data() + i * strides[0] + 2 * strides[1]);
-        vGyroX = *reinterpret_cast<float const *>(input.get_data() + i * strides[0] + 3 * strides[1]);
-        vGyroY = *reinterpret_cast<float const *>(input.get_data() + i * strides[0] + 4 * strides[1]);
-        vGytoZ = *reinterpret_cast<float const *>(input.get_data() + i * strides[0] + 5 * strides[1]);
-        vTimestamp = *reinterpret_cast<double const *>(input.get_data() + i * strides[0] + 6 * strides[1]);
-        vImuMeas.push_back(ORB_SLAM3::IMU::Point(vAccX,vAccY,vAccZ,vGyroX,vGyroY,vGyroZ,vTimestamp);
+        vAccX = *reinterpret_cast<float const *>(imu.get_data() + i * strides[0] + 0 * strides[1]);
+        vAccY = *reinterpret_cast<float const *>(imu.get_data() + i * strides[0] + 1 * strides[1]);
+        vAccZ = *reinterpret_cast<float const *>(imu.get_data() + i * strides[0] + 2 * strides[1]);
+        vGyroX = *reinterpret_cast<float const *>(imu.get_data() + i * strides[0] + 3 * strides[1]);
+        vGyroY = *reinterpret_cast<float const *>(imu.get_data() + i * strides[0] + 4 * strides[1]);
+        vGyroZ = *reinterpret_cast<float const *>(imu.get_data() + i * strides[0] + 5 * strides[1]);
+        vTimestamp = *reinterpret_cast<double const *>(imu.get_data() + i * strides[0] + 6 * strides[1]);
+        vImuMeas.push_back(ORB_SLAM3::IMU::Point(vAccX, vAccY, vAccZ, vGyroX, vGyroY, vGyroZ, vTimestamp));
     }
+    return vImuMeas;
 }

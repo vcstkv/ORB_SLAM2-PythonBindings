@@ -4,6 +4,7 @@
 #include <memory>
 #include <Python.h>
 #include <boost/python.hpp>
+#include <boost/python/numpy/ndarray.hpp>
 #include <ORB_SLAM3/System.h>
 #include <ORB_SLAM3/Tracking.h>
 
@@ -23,7 +24,7 @@ public:
     bool loadAndProcessStereo(std::string leftImageFile, std::string rightImageFile, double timestamp);
     bool processStereo(cv::Mat leftImage, cv::Mat rightImage, double timestamp);
     bool loadAndProcessImuMono(std::string imageFile, double timestamp, boost::python::numpy::ndarray imu);
-    bool processImuMono(cv::Mat image, double timestamp, std::string imageFile, , boost::python::numpy::ndarray imu);
+    bool processImuMono(cv::Mat image, double timestamp, std::string imageFile, boost::python::numpy::ndarray imu);
     bool loadAndProcessImuStereo(std::string leftImageFile, std::string rightImageFile, double timestamp, boost::python::numpy::ndarray imu);
     bool processImuStereo(cv::Mat leftImage, cv::Mat rightImage, double timestamp, boost::python::numpy::ndarray imu);
     bool loadAndProcessRGBD(std::string imageFile, std::string depthImageFile, double timestamp);
