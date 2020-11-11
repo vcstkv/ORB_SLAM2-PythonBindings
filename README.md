@@ -14,7 +14,10 @@ It has been tested on ubuntu 14.04 and 16.04 and built against Python3, although
 - Numpy development headers (to represent images in python, automatically converted to cv::Mat)
 
 ### Setup
-
+## clone the repo
+```
+git clone -b ORBSLAM3 https://github.com/GiordanoLaminetti/ORB_SLAM2-PythonBindings.git
+```
 #### Compilation
 
 Return to the ORBSLAM-Python source, build and install it by running
