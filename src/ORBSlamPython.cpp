@@ -20,7 +20,6 @@ static void init_ar()
 {
 #endif
     Py_Initialize();
-
     import_array();
     return NUMPY_IMPORT_ARRAY_RETVAL;
 }
@@ -28,7 +27,7 @@ static void init_ar()
 BOOST_PYTHON_MODULE(orbslam3)
 {
     init_ar();
-
+    boost::python::numpy::initialize();
     boost::python::to_python_converter<cv::Mat, pbcvt::matToNDArrayBoostConverter>();
     pbcvt::matFromNDArrayBoostConverter();
 
@@ -141,6 +140,7 @@ bool ORBSlamPython::loadAndProcessMono(std::string imageFile, double timestamp)
     return this->processMono(im, timestamp, imageFile);
 }
 // helper function to convert ndarray to vector<ORB_SLAM3::IMU::Point>
+
 vector<ORB_SLAM3::IMU::Point> convertImuFromNDArray(boost::python::numpy::ndarray imu);
 
 bool ORBSlamPython::processMono(cv::Mat image, double timestamp, std::string imageFile)
@@ -162,6 +162,7 @@ bool ORBSlamPython::processMono(cv::Mat image, double timestamp, std::string ima
 
 bool ORBSlamPython::loadAndProcessImuMono(std::string imageFile, double timestamp, boost::python::numpy::ndarray imu)
 {
+
     if (!system)
     {
         return false;

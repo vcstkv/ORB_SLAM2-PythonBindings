@@ -4,7 +4,7 @@
 #include <memory>
 #include <Python.h>
 #include <boost/python.hpp>
-#include <boost/python/numpy/ndarray.hpp>
+#include <boost/python/numpy.hpp>
 #include <ORB_SLAM3/System.h>
 #include <ORB_SLAM3/Tracking.h>
 
