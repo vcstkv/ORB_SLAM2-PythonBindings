@@ -1,6 +1,14 @@
 cmake_minimum_required(VERSION 2.8)
 project(ORB_SLAM2_PYTHON_BINDING)
 
+if (BUILD_SHARED_LIBS)
+    set (Boost_USE_STATIC_LIBS OFF)
+    set (Boost_USE_STATIC_RUNTIME OFF)
+else ()
+    set (Boost_USE_STATIC_LIBS ON)
+    set (Boost_USE_STATIC_RUNTIME ON)
+endif ()
+
 IF(NOT CMAKE_BUILD_TYPE)
   SET(CMAKE_BUILD_TYPE Release)
 ENDIF()
