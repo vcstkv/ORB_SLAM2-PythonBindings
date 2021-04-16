@@ -1,7 +1,3 @@
-# ORB_SLAM3 binding
-the bindings can be found at
-[ORB_SLAM3-PythonBindings](https://github.com/GiordanoLaminetti/ORB_SLAM2-PythonBindings/tree/ORBSLAM3)
-
 # Changes from Original Version of ORB_SLAM2-PythonBindings
 
 ## add method for retrieve the intrinsic parameter of camera
