@@ -30,7 +30,7 @@ endif()
 
 find_package(PythonLibs 3.5 REQUIRED)
 find_package(NumPy)
-find_package(Boost 1.45.0 REQUIRED COMPONENTS python-py35 numpy3)
+find_package(Boost 1.45.0 REQUIRED COMPONENTS python38)
 find_package(OpenCV REQUIRED)
 find_package(ORB_SLAM3 REQUIRED)
 find_package(Pangolin)
@@ -61,7 +61,7 @@ src/pyboost_cv2_converter.cpp
 src/pyboost_cv3_converter.cpp)
 set_target_properties(${TARGET_MODULE_NAME} PROPERTIES PREFIX "")
 
-target_link_libraries(${TARGET_MODULE_NAME} 
+target_link_libraries(${TARGET_MODULE_NAME}
 ${ORB_SLAM3_LIBRARIES}
 ${OpenCV_LIBS}
 ${Boost_LIBRARIES}
@@ -71,5 +71,4 @@ if (Pangolin_FOUND)
   target_link_libraries(${TARGET_MODULE_NAME} ${Pangolin_LIBRARIES})
 endif()
 
-install(TARGETS ${TARGET_MODULE_NAME} DESTINATION lib/python3.5/dist-packages)
-
+install(TARGETS ${TARGET_MODULE_NAME} DESTINATION lib/python3.8/dist-packages)
