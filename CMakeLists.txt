@@ -30,7 +30,7 @@ endif()
 
 find_package(PythonLibs 3.8 REQUIRED)
 find_package(NumPy)
-find_package(Boost REQUIRED COMPONENTS python38 numpy3)
+find_package(Boost REQUIRED COMPONENTS python38)
 find_package(OpenCV REQUIRED)
 find_package(ORB_SLAM2 REQUIRED)
 find_package(Pangolin)
