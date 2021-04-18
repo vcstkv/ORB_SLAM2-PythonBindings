@@ -23,9 +23,7 @@ the bindings can be found at
     get_current_points //return a list with a tuple pair ((world position),(2d keypoints))
 ```
 
-## problem with boots and python-35
-
-this [issue](https://github.com/jskinn/ORB_SLAM2-PythonBindings/issues/3) on the original repo show how fix it
+## update for the usage with python 3.8
 
 # ORB_SLAM2-PythonBindings
 
@@ -39,7 +37,7 @@ It has been tested on ubuntu 14.04 and 16.04 and built against Python3, although
 
 - ORBSLAM2 source code
 - ORBSLAM2 compiliation dependencies (Pangolin, Eigen, OpenCV)
-- Boost, specifically its python component (python-35)
+- Boost, specifically its python component (python38)
 - Numpy development headers (to represent images in python, automatically converted to cv::Mat)
 
 ### Setup
