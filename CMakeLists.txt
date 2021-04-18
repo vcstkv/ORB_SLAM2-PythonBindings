@@ -10,7 +10,7 @@ MESSAGE("Build type: " ${CMAKE_BUILD_TYPE})
 LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -Wall -L/usr/local/lib -Wl,--no-undefined -O3 -march=native ")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -L/usr/local/lib -lboost_numpy -Wl,--no-undefined  -O3 -march=native")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -L/usr/local/lib -Wl,--no-undefined  -O3 -march=native")
 
 # Check C++11 or C++0x support
 include(CheckCXXCompilerFlag)
@@ -28,9 +28,9 @@ else()
    message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 endif()
 
-find_package(PythonLibs 3.5 REQUIRED)
+find_package(PythonLibs 3.8 REQUIRED)
 find_package(NumPy)
-find_package(Boost 1.45.0 REQUIRED COMPONENTS python38)
+find_package(Boost REQUIRED COMPONENTS python38)
 find_package(OpenCV REQUIRED)
 find_package(ORB_SLAM3 REQUIRED)
 find_package(Pangolin)
