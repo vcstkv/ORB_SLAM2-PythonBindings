@@ -34,9 +34,9 @@ find_package(NumPy)
 find_package(Boost)
 
 if (Boost_MINOR_VERSION EQUAL 65)
-  find_package(Boost REQUIRED COMPONENTS python-py36 numpy)
+  find_package(Boost REQUIRED COMPONENTS python-py36 numpy3)
 else()
-  find_package(Boost REQUIRED COMPONENTS python38 numpy)
+  find_package(Boost REQUIRED COMPONENTS python38 numpy3)
 endif()
 
 find_package(OpenCV REQUIRED)
