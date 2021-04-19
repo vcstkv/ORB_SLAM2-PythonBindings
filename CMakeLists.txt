@@ -35,6 +35,7 @@ if (Python_VERSION_MINOR==6)
   find_package(Boost REQUIRED COMPONENTS python-py36)
 else()
   find_package(Boost REQUIRED)
+  message(STATUS " ${Python_VERSION}")
 endif()
 
 find_package(OpenCV REQUIRED)
