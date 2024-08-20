@@ -17,7 +17,7 @@ include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
 CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
 if(COMPILER_SUPPORTS_CXX11)
-   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
    add_definitions(-DCOMPILEDWITHC11)
    message(STATUS "Using flag -std=c++11.")
 elseif(COMPILER_SUPPORTS_CXX0X)
@@ -36,7 +36,7 @@ find_package(Boost)
 if (Boost_MINOR_VERSION EQUAL 65)
   find_package(Boost REQUIRED COMPONENTS python-py36 numpy3)
 else()
-  find_package(Boost REQUIRED COMPONENTS python38 numpy3)
+  find_package(Boost 1.85 REQUIRED COMPONENTS python312 numpy3)
 endif()
 
 find_package(OpenCV REQUIRED)
@@ -66,7 +66,9 @@ set(TARGET_MODULE_NAME orbslam3)
 add_library(${TARGET_MODULE_NAME} SHARED
 src/ORBSlamPython.cpp
 src/pyboost_cv2_converter.cpp
-src/pyboost_cv3_converter.cpp)
+src/pyboost_cv3_converter.cpp
+src/pyboost_cv4_converter.cpp
+)
 set_target_properties(${TARGET_MODULE_NAME} PROPERTIES PREFIX "")
 
 target_link_libraries(${TARGET_MODULE_NAME}
@@ -79,4 +81,4 @@ if (Pangolin_FOUND)
   target_link_libraries(${TARGET_MODULE_NAME} ${Pangolin_LIBRARIES})
 endif()
 
-install(TARGETS ${TARGET_MODULE_NAME} DESTINATION lib/python3.8/dist-packages)
+install(TARGETS ${TARGET_MODULE_NAME} DESTINATION $ENV{CONDA_PREFIX}/lib/)
