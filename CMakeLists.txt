@@ -41,6 +41,7 @@ endif()
 
 find_package(OpenCV REQUIRED)
 find_package(ORB_SLAM3 REQUIRED)
+find_package(Eigen3 3.1.0 REQUIRED)
 find_package(Pangolin)
 
 # RPATH fiddling for the library, so that the installed version can find the linked libraries
@@ -76,6 +77,7 @@ ${ORB_SLAM3_LIBRARIES}
 ${OpenCV_LIBS}
 ${Boost_LIBRARIES}
 ${PYTHON_LIBRARIES}
+Eigen3::Eigen
 )
 if (Pangolin_FOUND)
   target_link_libraries(${TARGET_MODULE_NAME} ${Pangolin_LIBRARIES})

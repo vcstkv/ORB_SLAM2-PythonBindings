@@ -6,6 +6,8 @@
 #include <ORB_SLAM3/Tracking.h>
 #include <ORB_SLAM3/MapPoint.h>
 #include "ORBSlamPython.h"
+#include "eigen_converter.hpp"
+
 #if PY_VERSION_HEX >= 0x03000000
 #define NUMPY_IMPORT_ARRAY_RETVAL NULL
 #else
@@ -151,8 +153,8 @@ bool ORBSlamPython::processMono(cv::Mat image, double timestamp, std::string ima
     }
     if (image.data)
     {
-        cv::Mat pose = system->TrackMonocular(image, timestamp, vector<ORB_SLAM3::IMU::Point>(), imageFile);
-        return !pose.empty();
+        system->TrackMonocular(image, timestamp, vector<ORB_SLAM3::IMU::Point>(), imageFile);
+        return system->GetTrackingState() == ORB_SLAM3::Tracking::OK;
     }
     else
     {
@@ -184,8 +186,8 @@ bool ORBSlamPython::processImuMono(cv::Mat image, double timestamp, std::string 
     if (image.data)
     {
         vector<ORB_SLAM3::IMU::Point> vImuMeas = convertImuFromNDArray(imu);
-        cv::Mat pose = system->TrackMonocular(image, timestamp, vImuMeas);
-        return !pose.empty();
+        system->TrackMonocular(image, timestamp, vImuMeas);
+        return system->GetTrackingState() == ORB_SLAM3::Tracking::OK;
     }
     else
     {
@@ -217,8 +219,8 @@ bool ORBSlamPython::processStereo(cv::Mat leftImage, cv::Mat rightImage, double 
     }
     if (leftImage.data && rightImage.data)
     {
-        cv::Mat pose = system->TrackStereo(leftImage, rightImage, timestamp);
-        return !pose.empty();
+        system->TrackStereo(leftImage, rightImage, timestamp);
+        return system->GetTrackingState() == ORB_SLAM3::Tracking::OK;
     }
     else
     {
@@ -251,8 +253,8 @@ bool ORBSlamPython::processImuStereo(cv::Mat leftImage, cv::Mat rightImage, doub
     if (leftImage.data && rightImage.data)
     {
         vector<ORB_SLAM3::IMU::Point> vImuMeas = convertImuFromNDArray(imu);
-        cv::Mat pose = system->TrackStereo(leftImage, rightImage, timestamp, vImuMeas);
-        return !pose.empty();
+        system->TrackStereo(leftImage, rightImage, timestamp, vImuMeas);
+        return system->GetTrackingState() == ORB_SLAM3::Tracking::OK;
     }
     else
     {
@@ -283,8 +285,8 @@ bool ORBSlamPython::processRGBD(cv::Mat image, cv::Mat depthImage, double timest
     }
     if (image.data && depthImage.data)
     {
-        cv::Mat pose = system->TrackRGBD(image, depthImage, timestamp);
-        return !pose.empty();
+        system->TrackRGBD(image, depthImage, timestamp);
+        return system->GetTrackingState() == ORB_SLAM3::Tracking::OK;
     }
     else
     {
@@ -390,10 +392,10 @@ boost::python::list ORBSlamPython::getKeyframePoints() const
         if (pKF->isBad())
             continue;
 
-        cv::Mat R = pKF->GetRotation().t();
-        cv::Mat t = pKF->GetCameraCenter();
-        PyObject *Rarr = pbcvt::fromMatToNDArray(R);
-        PyObject *Tarr = pbcvt::fromMatToNDArray(t);
+        auto R = pKF->GetRotation();
+        auto t = pKF->GetCameraCenter();
+        PyObject *Rarr = convert_eigen_matrix(R);
+        PyObject *Tarr = convert_eigen_vector(t);
         trajectory.append(boost::python::make_tuple(
             pKF->mTimeStamp,
             boost::python::handle<>(Rarr),
@@ -418,11 +420,11 @@ boost::python::list ORBSlamPython::getTrackedMappoints() const
     {
         if (Mps[i] != NULL)
         {
-            cv::Mat wp = Mps[i]->GetWorldPos();
+            auto wp = Mps[i]->GetWorldPos();
             map_points.append(boost::python::make_tuple(
-                wp.at<float>(0, 0),
-                wp.at<float>(1, 0),
-                wp.at<float>(2, 0)));
+                wp(0),
+                wp(1),
+                wp(2)));
         }
     }
 
@@ -451,12 +453,12 @@ boost::python::list ORBSlamPython::getCurrentPoints() const
             ORB_SLAM3::MapPoint *pMP = pTracker->mCurrentFrame.mvpMapPoints[i];
             if (pMP && !pTracker->mCurrentFrame.mvbOutlier[i] && pMP->Observations() > 0)
             {
-                cv::Mat wp = pMP->GetWorldPos();
+                auto wp = pMP->GetWorldPos();
                 map_points.append(boost::python::make_tuple(
                     boost::python::make_tuple(
-                        wp.at<float>(0, 0),
-                        wp.at<float>(1, 0),
-                        wp.at<float>(2, 0)),
+                        wp(0),
+                        wp(1),
+                        wp(2)),
                     boost::python::make_tuple(
                         Kps[i].pt.x,
                         Kps[i].pt.y)));
@@ -471,12 +473,11 @@ PyObject *ORBSlamPython::getFramePose() const
 {
     if (system)
     {
-
         ORB_SLAM3::Tracking *pTracker = system->GetTracker();
-        cv::Mat pose = pTracker->mCurrentFrame.mTcw;
-        if (pose.rows * pose.cols > 0)
+        auto pose = pTracker->mCurrentFrame.GetPose();
+        if (system->GetTrackingState() == ORB_SLAM3::Tracking::OK)
         {
-            return pbcvt::fromMatToNDArray(pose);
+            return convert_eigen_matrix(pose.matrix());
         }
     }
     return NULL;
@@ -524,10 +525,10 @@ boost::python::list ORBSlamPython::getTrajectoryPoints() const
     // Transform all keyframes so that the first keyframe is at the origin.
     // After a loop closure the first keyframe might not be at the origin.
     // Of course, if we have no keyframes, then just use the identity matrix.
-    cv::Mat Two = cv::Mat::eye(4, 4, CV_32F);
+    Sophus::SE3f Two{};
     if (vpKFs.size() > 0)
     {
-        cv::Mat Two = vpKFs[0]->GetPoseInverse();
+        Two = vpKFs[0]->GetPoseInverse();
     }
 
     boost::python::list trajectory;
@@ -540,11 +541,11 @@ boost::python::list ORBSlamPython::getTrajectoryPoints() const
     // which is true when tracking failed (lbL).
     std::list<ORB_SLAM3::KeyFrame *>::iterator lRit = system->GetTracker()->mlpReferences.begin();
     std::list<double>::iterator lT = system->GetTracker()->mlFrameTimes.begin();
-    for (std::list<cv::Mat>::iterator lit = system->GetTracker()->mlRelativeFramePoses.begin(), lend = system->GetTracker()->mlRelativeFramePoses.end(); lit != lend; lit++, lRit++, lT++)
+    for (std::list<Sophus::SE3f>::iterator lit = system->GetTracker()->mlRelativeFramePoses.begin(), lend = system->GetTracker()->mlRelativeFramePoses.end(); lit != lend; lit++, lRit++, lT++)
     {
         ORB_SLAM3::KeyFrame *pKF = *lRit;
 
-        cv::Mat Trw = cv::Mat::eye(4, 4, CV_32F);
+        Sophus::SE3f Trw{};
 
         while (pKF != NULL && pKF->isBad())
         {
@@ -567,10 +568,10 @@ boost::python::list ORBSlamPython::getTrajectoryPoints() const
         {
             Trw = Trw * pKF->GetPose() * Two;
 
-            cv::Mat Tcw = (*lit) * Trw;
+            auto Tcw = (*lit) * Trw;
             //cv::Mat Rwc = Tcw.rowRange(0, 3).colRange(0, 3).t();
             //cv::Mat twc = -Rwc * Tcw.rowRange(0, 3).col(3);
-            PyObject *ndarr = pbcvt::fromMatToNDArray(Tcw);
+            PyObject *ndarr = convert_eigen_matrix(Tcw.matrix());
             trajectory.append(boost::python::make_tuple(
                 *lT,
                 boost::python::handle<>(ndarr)));
